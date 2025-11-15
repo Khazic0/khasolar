@@ -29,6 +29,7 @@ require_once KHASOLAR_DIR . '/inc/cpt-solar-project.php';
 require_once KHASOLAR_DIR . '/inc/template-tags.php';
 require_once KHASOLAR_DIR . '/inc/leads.php';
 require_once KHASOLAR_DIR . '/inc/demo-content.php';
+require_once KHASOLAR_DIR . '/inc/import-real-products.php';
 require_once KHASOLAR_DIR . '/inc/calculator.php';
 require_once KHASOLAR_DIR . '/inc/quick-contact.php';
 
