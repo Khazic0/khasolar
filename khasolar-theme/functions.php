@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define theme constants
  */
-define( 'KHASOLAR_VERSION', '1.0.0' );
+define( 'KHASOLAR_VERSION', '1.1.0' );
 define( 'KHASOLAR_DIR', get_template_directory() );
 define( 'KHASOLAR_URI', get_template_directory_uri() );
 
@@ -29,6 +29,8 @@ require_once KHASOLAR_DIR . '/inc/cpt-solar-project.php';
 require_once KHASOLAR_DIR . '/inc/template-tags.php';
 require_once KHASOLAR_DIR . '/inc/leads.php';
 require_once KHASOLAR_DIR . '/inc/demo-content.php';
+require_once KHASOLAR_DIR . '/inc/calculator.php';
+require_once KHASOLAR_DIR . '/inc/quick-contact.php';
 
 /**
  * Theme activation hook

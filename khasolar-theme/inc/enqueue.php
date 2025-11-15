@@ -56,6 +56,15 @@ function khasolar_enqueue_scripts() {
         true
     );
 
+    // Calculator JavaScript
+    wp_enqueue_script(
+        'khasolar-calculator',
+        KHASOLAR_URI . '/assets/js/calculator.js',
+        array( 'jquery', 'khasolar-main' ),
+        KHASOLAR_VERSION,
+        true
+    );
+
     // Localize script for AJAX
     wp_localize_script( 'khasolar-main', 'khasolarData', array(
         'ajaxUrl' => admin_url( 'admin-ajax.php' ),
