@@ -1,0 +1,24 @@
+/*
+Theme Name: Kha Solar Theme
+Theme URI: https://khasolar.vn
+Author: Kha Solar Team
+Author URI: https://khasolar.vn
+Description: Custom WordPress theme for Kha Solar - Solar inverters, panels, batteries and accessories. Modern B2B ecommerce design with custom product catalog and lead generation system.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.4
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: khasolar
+Tags: solar, ecommerce, b2b, custom-post-types, lead-generation
+
+Kha Solar Theme, Copyright 2025
+Kha Solar Theme is distributed under the terms of the GNU GPL.
+*/
+
+/*
+ * NOTE: This file is required by WordPress to recognize the theme.
+ * All actual styles are loaded from /assets/css/main.css
+ * This keeps the theme organized and maintainable.
+ */
