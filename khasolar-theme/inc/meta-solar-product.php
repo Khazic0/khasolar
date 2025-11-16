@@ -50,8 +50,15 @@ function khasolar_product_details_callback( $post ) {
     $voltage       = get_post_meta( $post->ID, '_ks_voltage', true );
     $warranty      = get_post_meta( $post->ID, '_ks_warranty_years', true );
     $origin        = get_post_meta( $post->ID, '_ks_origin', true );
-    $price_from    = get_post_meta( $post->ID, '_ks_price_from', true );
+    $price_from    = get_post_meta( $post->ID, '_ks_price_from', true ); // Backward compatibility
+    $regular_price = get_post_meta( $post->ID, '_ks_regular_price', true );
+    $sale_price    = get_post_meta( $post->ID, '_ks_sale_price', true );
     $stock_status  = get_post_meta( $post->ID, '_ks_stock_status', true );
+
+    // If regular price not set but price_from is, use price_from as regular price
+    if ( empty( $regular_price ) && ! empty( $price_from ) ) {
+        $regular_price = $price_from;
+    }
     ?>
 
     <style>
@@ -111,19 +118,28 @@ function khasolar_product_details_callback( $post ) {
         </div>
 
         <div class="khasolar-meta-field">
-            <label for="ks_price_from"><?php _e( 'Giá từ (VNĐ)', 'khasolar' ); ?></label>
-            <input type="number" id="ks_price_from" name="ks_price_from" value="<?php echo esc_attr( $price_from ); ?>" min="0" placeholder="VD: 15000000">
+            <label for="ks_stock_status"><?php _e( 'Tình trạng kho', 'khasolar' ); ?></label>
+            <select id="ks_stock_status" name="ks_stock_status">
+                <option value="in_stock" <?php selected( $stock_status, 'in_stock' ); ?>><?php _e( 'Còn hàng', 'khasolar' ); ?></option>
+                <option value="low_stock" <?php selected( $stock_status, 'low_stock' ); ?>><?php _e( 'Sắp hết', 'khasolar' ); ?></option>
+                <option value="out_of_stock" <?php selected( $stock_status, 'out_of_stock' ); ?>><?php _e( 'Hết hàng', 'khasolar' ); ?></option>
+                <option value="pre_order" <?php selected( $stock_status, 'pre_order' ); ?>><?php _e( 'Đặt trước', 'khasolar' ); ?></option>
+            </select>
         </div>
     </div>
 
-    <div class="khasolar-meta-field">
-        <label for="ks_stock_status"><?php _e( 'Tình trạng kho', 'khasolar' ); ?></label>
-        <select id="ks_stock_status" name="ks_stock_status">
-            <option value="in_stock" <?php selected( $stock_status, 'in_stock' ); ?>><?php _e( 'Còn hàng', 'khasolar' ); ?></option>
-            <option value="low_stock" <?php selected( $stock_status, 'low_stock' ); ?>><?php _e( 'Sắp hết', 'khasolar' ); ?></option>
-            <option value="out_of_stock" <?php selected( $stock_status, 'out_of_stock' ); ?>><?php _e( 'Hết hàng', 'khasolar' ); ?></option>
-            <option value="pre_order" <?php selected( $stock_status, 'pre_order' ); ?>><?php _e( 'Đặt trước', 'khasolar' ); ?></option>
-        </select>
+    <div class="khasolar-meta-row">
+        <div class="khasolar-meta-field">
+            <label for="ks_regular_price"><?php _e( 'Giá gốc (VNĐ)', 'khasolar' ); ?></label>
+            <input type="number" id="ks_regular_price" name="ks_regular_price" value="<?php echo esc_attr( $regular_price ); ?>" min="0" placeholder="VD: 20000000">
+            <p class="description"><?php _e( 'Giá niêm yết chính thức của sản phẩm', 'khasolar' ); ?></p>
+        </div>
+
+        <div class="khasolar-meta-field">
+            <label for="ks_sale_price"><?php _e( 'Giá khuyến mãi (VNĐ)', 'khasolar' ); ?></label>
+            <input type="number" id="ks_sale_price" name="ks_sale_price" value="<?php echo esc_attr( $sale_price ); ?>" min="0" placeholder="VD: 15000000">
+            <p class="description"><?php _e( 'Để trống nếu không có khuyến mãi. Giá khuyến mãi phải nhỏ hơn giá gốc.', 'khasolar' ); ?></p>
+        </div>
     </div>
 
     <?php
@@ -180,9 +196,17 @@ function khasolar_save_product_meta( $post_id ) {
         '_ks_warranty_years'  => 'absint',
         '_ks_origin'          => 'sanitize_text_field',
         '_ks_price_from'      => 'absint',
+        '_ks_regular_price'   => 'absint',
+        '_ks_sale_price'      => 'absint',
         '_ks_stock_status'    => 'sanitize_text_field',
         '_ks_key_specs'       => 'sanitize_textarea_field',
     );
+
+    // Sync price_from with regular_price for backward compatibility
+    if ( isset( $_POST['ks_regular_price'] ) ) {
+        $regular_price = absint( $_POST['ks_regular_price'] );
+        update_post_meta( $post_id, '_ks_price_from', $regular_price );
+    }
 
     foreach ( $fields as $meta_key => $sanitize_callback ) {
         $form_key = str_replace( '_ks_', 'ks_', $meta_key );
@@ -219,6 +243,60 @@ function khasolar_get_stock_status_label( $status ) {
     );
 
     return isset( $labels[ $status ] ) ? $labels[ $status ] : $labels['in_stock'];
+}
+
+/**
+ * Get product price data (regular price, sale price, discount %)
+ */
+function khasolar_get_product_price_data( $product_id ) {
+    $regular_price = get_post_meta( $product_id, '_ks_regular_price', true );
+    $sale_price    = get_post_meta( $product_id, '_ks_sale_price', true );
+
+    // Backward compatibility: use price_from if regular_price not set
+    if ( empty( $regular_price ) ) {
+        $regular_price = get_post_meta( $product_id, '_ks_price_from', true );
+    }
+
+    $data = array(
+        'regular_price' => $regular_price,
+        'sale_price'    => $sale_price,
+        'has_sale'      => false,
+        'discount_percent' => 0,
+        'final_price'   => $regular_price,
+    );
+
+    // Check if there's a valid sale
+    if ( ! empty( $sale_price ) && ! empty( $regular_price ) && $sale_price < $regular_price ) {
+        $data['has_sale'] = true;
+        $data['discount_percent'] = round( ( ( $regular_price - $sale_price ) / $regular_price ) * 100 );
+        $data['final_price'] = $sale_price;
+    }
+
+    return $data;
+}
+
+/**
+ * Display product price HTML
+ */
+function khasolar_display_product_price( $product_id ) {
+    $price_data = khasolar_get_product_price_data( $product_id );
+
+    if ( empty( $price_data['regular_price'] ) ) {
+        echo '<span class="price-contact">' . __( 'Liên hệ', 'khasolar' ) . '</span>';
+        return;
+    }
+
+    if ( $price_data['has_sale'] ) {
+        echo '<div class="product-price-wrapper">';
+        echo '<span class="price-regular">' . khasolar_format_price( $price_data['regular_price'] ) . '</span>';
+        echo '<span class="price-sale">' . khasolar_format_price( $price_data['sale_price'] ) . '</span>';
+        if ( $price_data['discount_percent'] > 0 ) {
+            echo '<span class="price-discount">-' . $price_data['discount_percent'] . '%</span>';
+        }
+        echo '</div>';
+    } else {
+        echo '<span class="price-value">' . khasolar_format_price( $price_data['regular_price'] ) . '</span>';
+    }
 }
 
 /**

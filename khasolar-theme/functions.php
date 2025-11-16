@@ -19,6 +19,42 @@ define( 'KHASOLAR_DIR', get_template_directory() );
 define( 'KHASOLAR_URI', get_template_directory_uri() );
 
 /**
+ * Increase upload size and image processing limits
+ */
+@ini_set( 'upload_max_size', '64M' );
+@ini_set( 'post_max_size', '64M' );
+@ini_set( 'max_execution_time', '300' );
+@ini_set( 'memory_limit', '256M' );
+
+/**
+ * Filter upload size limit
+ */
+function khasolar_increase_upload_size( $size ) {
+    return 1024 * 1024 * 64; // 64MB
+}
+add_filter( 'upload_size_limit', 'khasolar_increase_upload_size' );
+
+/**
+ * Add custom image sizes for better handling
+ */
+function khasolar_custom_image_sizes() {
+    // Medium-large size for products
+    add_image_size( 'product-medium', 800, 800, false );
+    // Large size with reasonable dimensions
+    add_image_size( 'product-large', 1200, 1200, false );
+}
+add_action( 'after_setup_theme', 'khasolar_custom_image_sizes' );
+
+/**
+ * Increase image processing memory
+ */
+function khasolar_increase_image_memory( $image ) {
+    @ini_set( 'memory_limit', '256M' );
+    return $image;
+}
+add_filter( 'wp_image_editors', 'khasolar_increase_image_memory' );
+
+/**
  * Include theme files
  */
 require_once KHASOLAR_DIR . '/inc/setup.php';

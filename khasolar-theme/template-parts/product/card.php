@@ -74,10 +74,24 @@ $stock_status  = ! empty( $stock_status ) ? $stock_status : 'in_stock';
 
         <div class="product-card-footer">
             <div class="product-price">
-                <?php if ( $price_from && $price_from > 0 ) : ?>
-                    <span class="price-label"><?php _e( 'Giá từ:', 'khasolar' ); ?></span>
-                    <span class="price-value"><?php echo khasolar_format_price( $price_from ); ?></span>
-                <?php else : ?>
+                <?php
+                $price_data = khasolar_get_product_price_data( $product_id );
+                if ( ! empty( $price_data['regular_price'] ) ) :
+                    if ( $price_data['has_sale'] ) : ?>
+                        <div class="price-wrapper">
+                            <div class="price-group">
+                                <span class="price-regular"><del><?php echo khasolar_format_price( $price_data['regular_price'] ); ?></del></span>
+                                <span class="price-sale"><?php echo khasolar_format_price( $price_data['sale_price'] ); ?></span>
+                            </div>
+                            <?php if ( $price_data['discount_percent'] > 0 ) : ?>
+                                <span class="price-badge">-<?php echo $price_data['discount_percent']; ?>%</span>
+                            <?php endif; ?>
+                        </div>
+                    <?php else : ?>
+                        <span class="price-label"><?php _e( 'Giá:', 'khasolar' ); ?></span>
+                        <span class="price-value"><?php echo khasolar_format_price( $price_data['regular_price'] ); ?></span>
+                    <?php endif;
+                else : ?>
                     <span class="price-contact"><?php _e( 'Liên hệ', 'khasolar' ); ?></span>
                 <?php endif; ?>
             </div>
