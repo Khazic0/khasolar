@@ -76,6 +76,15 @@ function khasolar_enqueue_scripts() {
         );
     }
 
+    // Cart JavaScript
+    wp_enqueue_script(
+        'khasolar-cart',
+        KHASOLAR_URI . '/assets/js/cart.js',
+        array( 'jquery', 'khasolar-main' ),
+        KHASOLAR_VERSION,
+        true
+    );
+
     // Localize script for AJAX
     wp_localize_script( 'khasolar-main', 'khasolarData', array(
         'ajaxUrl' => admin_url( 'admin-ajax.php' ),

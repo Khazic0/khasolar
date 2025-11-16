@@ -83,14 +83,19 @@ $stock_status  = ! empty( $stock_status ) ? $stock_status : 'in_stock';
             </div>
 
             <div class="product-card-actions">
-                <button type="button" class="add-to-compare <?php echo khasolar_is_product_in_compare( $product_id ) ? 'is-comparing' : ''; ?>" data-product-id="<?php echo esc_attr( $product_id ); ?>">
-                    <span class="dashicons dashicons-chart-bar"></span>
-                    <span class="compare-text">
-                        <?php echo khasolar_is_product_in_compare( $product_id ) ? __( 'Bỏ so sánh', 'khasolar' ) : __( 'So sánh', 'khasolar' ); ?>
-                    </span>
+                <button type="button" class="add-to-cart-btn" data-product-id="<?php echo esc_attr( $product_id ); ?>" title="<?php _e( 'Thêm vào giỏ hàng', 'khasolar' ); ?>">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span><?php _e( 'Thêm vào giỏ', 'khasolar' ); ?></span>
                 </button>
-                <a href="<?php the_permalink(); ?>" class="btn btn-primary btn-small">
-                    <?php _e( 'Xem chi tiết', 'khasolar' ); ?>
+                <a href="<?php echo esc_url( khasolar_get_zalo_buy_link( $product_id ) ); ?>" class="btn btn-primary btn-small buy-now-btn" target="_blank" rel="noopener">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span><?php _e( 'Mua ngay', 'khasolar' ); ?></span>
                 </a>
             </div>
         </div>

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define theme constants
  */
-define( 'KHASOLAR_VERSION', '1.2.0' );
+define( 'KHASOLAR_VERSION', '1.3.0' );
 define( 'KHASOLAR_DIR', get_template_directory() );
 define( 'KHASOLAR_URI', get_template_directory_uri() );
 
@@ -40,6 +40,7 @@ require_once KHASOLAR_DIR . '/inc/setup-wizard.php';
 require_once KHASOLAR_DIR . '/inc/performance.php';
 require_once KHASOLAR_DIR . '/inc/analytics.php';
 require_once KHASOLAR_DIR . '/inc/product-gallery.php';
+require_once KHASOLAR_DIR . '/inc/cart.php';
 
 /**
  * Theme activation hook
