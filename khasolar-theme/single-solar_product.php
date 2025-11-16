@@ -39,35 +39,15 @@ get_header();
         <div class="container">
             <div class="product-main-grid">
 
-                <!-- Product Gallery -->
+                <!-- Product Gallery (WooCommerce-style) -->
                 <div class="product-gallery-section">
-                    <div class="product-main-image-wrapper">
-                        <?php if ( $stock_status !== 'in_stock' ) : ?>
-                            <div class="product-badge-overlay badge-<?php echo esc_attr( $stock_status ); ?>">
-                                <?php echo esc_html( khasolar_get_stock_status_label( $stock_status ) ); ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if ( has_post_thumbnail() ) : ?>
-                            <div class="product-main-image">
-                                <?php the_post_thumbnail( 'large', array( 'class' => 'zoom-image' ) ); ?>
-                            </div>
-                        <?php else : ?>
-                            <div class="product-main-image product-placeholder">
-                                <img src="<?php echo esc_url( khasolar_get_placeholder_image() ); ?>" alt="<?php the_title_attribute(); ?>" class="zoom-image">
-                            </div>
-                        <?php endif; ?>
-
-                        <div class="image-zoom-hint">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                <line x1="11" y1="8" x2="11" y2="14"></line>
-                                <line x1="8" y1="11" x2="14" y2="11"></line>
-                            </svg>
-                            <?php _e( 'Click để phóng to', 'khasolar' ); ?>
+                    <?php if ( $stock_status !== 'in_stock' ) : ?>
+                        <div class="product-badge-overlay badge-<?php echo esc_attr( $stock_status ); ?>">
+                            <?php echo esc_html( khasolar_get_stock_status_label( $stock_status ) ); ?>
                         </div>
-                    </div>
+                    <?php endif; ?>
+
+                    <?php khasolar_display_product_gallery( $product_id ); ?>
 
                     <!-- Trust Badges -->
                     <div class="product-trust-features">

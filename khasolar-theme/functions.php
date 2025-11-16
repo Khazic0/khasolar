@@ -39,6 +39,7 @@ require_once KHASOLAR_DIR . '/inc/sitemap.php';
 require_once KHASOLAR_DIR . '/inc/setup-wizard.php';
 require_once KHASOLAR_DIR . '/inc/performance.php';
 require_once KHASOLAR_DIR . '/inc/analytics.php';
+require_once KHASOLAR_DIR . '/inc/product-gallery.php';
 
 /**
  * Theme activation hook

@@ -65,6 +65,17 @@ function khasolar_enqueue_scripts() {
         true
     );
 
+    // Product Gallery JavaScript (only on single product pages)
+    if ( is_singular( 'solar_product' ) ) {
+        wp_enqueue_script(
+            'khasolar-product-gallery',
+            KHASOLAR_URI . '/assets/js/product-gallery.js',
+            array(),
+            KHASOLAR_VERSION,
+            true
+        );
+    }
+
     // Localize script for AJAX
     wp_localize_script( 'khasolar-main', 'khasolarData', array(
         'ajaxUrl' => admin_url( 'admin-ajax.php' ),
