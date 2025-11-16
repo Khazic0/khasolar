@@ -330,6 +330,16 @@ function khasolar_save_product_gallery( $post_id ) {
     if ( isset( $_POST['product_gallery_images'] ) ) {
         $gallery_images = sanitize_text_field( $_POST['product_gallery_images'] );
         update_post_meta( $post_id, '_product_gallery_images', $gallery_images );
+
+        // Auto-set featured image from first gallery image if no featured image exists
+        if ( ! has_post_thumbnail( $post_id ) && ! empty( $gallery_images ) ) {
+            $image_ids = explode( ',', $gallery_images );
+            $first_image_id = isset( $image_ids[0] ) ? intval( $image_ids[0] ) : 0;
+
+            if ( $first_image_id > 0 ) {
+                set_post_thumbnail( $post_id, $first_image_id );
+            }
+        }
     } else {
         delete_post_meta( $post_id, '_product_gallery_images' );
     }

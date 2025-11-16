@@ -66,6 +66,13 @@
                     scrollThumbnails('next');
                 });
             }
+
+            // Update navigation on scroll
+            if (thumbnailsTrack) {
+                thumbnailsTrack.addEventListener('scroll', () => {
+                    updateThumbnailNavigation();
+                }, { passive: true });
+            }
         }
 
         // Open lightbox
@@ -189,6 +196,22 @@
 
             prevBtn.disabled = isAtStart;
             nextBtn.disabled = isAtEnd;
+
+            // Update scroll indicators
+            const container = thumbnailsTrack.closest('.thumbnails-container');
+            if (container) {
+                if (isAtStart) {
+                    container.classList.remove('scrolled');
+                } else {
+                    container.classList.add('scrolled');
+                }
+
+                if (isAtEnd) {
+                    container.classList.add('scrolled-end');
+                } else {
+                    container.classList.remove('scrolled-end');
+                }
+            }
         }
 
         function openLightbox(index) {

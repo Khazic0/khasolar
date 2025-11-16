@@ -93,6 +93,15 @@ add_action( 'wp_enqueue_scripts', 'khasolar_enqueue_scripts' );
  * Enqueue admin styles and scripts
  */
 function khasolar_admin_enqueue_scripts( $hook ) {
+    global $post_type;
+
+    // Enqueue media uploader on product edit pages
+    if ( ( 'post.php' === $hook || 'post-new.php' === $hook ) && 'solar_product' === $post_type ) {
+        wp_enqueue_media();
+
+        // jQuery UI for sortable
+        wp_enqueue_script( 'jquery-ui-sortable' );
+    }
 
     // Only on our demo content page
     if ( 'toplevel_page_khasolar-demo' !== $hook ) {

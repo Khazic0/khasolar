@@ -4193,3 +4193,283 @@ ul, ol {
         padding: 6px 16px;
     }
 }
+
+/* ==========================================================================
+   GALLERY OPTIMIZATIONS - Desktop & Mobile (v1.2.0 Enhanced)
+   ========================================================================== */
+
+/* Enhanced Main Image Wrapper */
+.main-image-wrapper {
+    transition: all 0.3s ease;
+}
+
+.main-image-wrapper:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Gallery Main Image - Better aspect ratio handling */
+@media (min-width: 1024px) {
+    .khasolar-product-gallery {
+        margin-bottom: var(--ks-spacing-md);
+    }
+
+    .gallery-main-image {
+        margin-bottom: 16px;
+    }
+
+    .main-image-wrapper {
+        min-height: 400px;
+    }
+
+    /* Larger thumbnails on desktop */
+    .thumbnail-item {
+        width: 90px;
+        height: 90px;
+    }
+
+    /* More visible lightbox trigger */
+    .gallery-lightbox-trigger {
+        width: 52px;
+        height: 52px;
+    }
+
+    .gallery-lightbox-trigger svg {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 769px) and (max-width: 1023px) {
+    .thumbnail-item {
+        width: 75px;
+        height: 75px;
+    }
+
+    .thumbnails-track {
+        gap: 10px;
+    }
+
+    .thumbnail-nav {
+        width: 34px;
+        height: 34px;
+    }
+}
+
+/* Mobile Gallery Enhancements */
+@media (max-width: 768px) {
+    .khasolar-product-gallery {
+        margin-bottom: var(--ks-spacing-sm);
+    }
+
+    .gallery-main-image {
+        margin-bottom: 12px;
+    }
+
+    .main-image-wrapper {
+        min-height: 280px;
+    }
+
+    /* Larger touch targets for thumbnails */
+    .thumbnail-item {
+        width: 65px;
+        height: 65px;
+        border-width: 3px;
+    }
+
+    .thumbnail-item.active {
+        border-width: 3px;
+    }
+
+    .thumbnails-track {
+        gap: 10px;
+        padding: 6px 0;
+    }
+
+    /* Larger navigation buttons */
+    .thumbnail-nav {
+        width: 36px;
+        height: 36px;
+        border-width: 2px;
+    }
+
+    .thumbnail-nav svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Larger lightbox trigger */
+    .gallery-lightbox-trigger {
+        width: 44px;
+        height: 44px;
+        bottom: 14px;
+        right: 14px;
+    }
+
+    .gallery-lightbox-trigger svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    /* Mobile lightbox improvements */
+    .lightbox-close {
+        top: 12px;
+        right: 12px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .lightbox-close svg {
+        width: 26px;
+        height: 26px;
+    }
+
+    .lightbox-nav {
+        width: 54px;
+        height: 54px;
+    }
+
+    .lightbox-prev {
+        left: 12px;
+    }
+
+    .lightbox-next {
+        right: 12px;
+    }
+
+    .lightbox-nav svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .lightbox-counter {
+        font-size: 0.938rem;
+        padding: 10px 20px;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+    .main-image-wrapper {
+        min-height: 260px;
+    }
+
+    .thumbnail-item {
+        width: 55px;
+        height: 55px;
+    }
+
+    .thumbnails-track {
+        gap: 8px;
+    }
+
+    .thumbnail-nav {
+        width: 32px;
+        height: 32px;
+    }
+
+    .thumbnail-nav svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .gallery-lightbox-trigger {
+        width: 40px;
+        height: 40px;
+    }
+
+    .gallery-lightbox-trigger svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Loading State */
+.main-product-image {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+.main-product-image[src] {
+    background: none;
+    animation: none;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Thumbnail Scroll Indicator */
+.thumbnails-container::before,
+.thumbnails-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+.thumbnails-container::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.9), transparent);
+    opacity: 0;
+}
+
+.thumbnails-container::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.9), transparent);
+}
+
+.thumbnails-container.scrolled::before {
+    opacity: 1;
+}
+
+.thumbnails-container.scrolled-end::after {
+    opacity: 0;
+}
+
+/* Product Badge Overlay Enhancement */
+.product-gallery-section .product-badge-overlay {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 20;
+}
+
+/* Smooth Image Transitions */
+.main-product-image {
+    will-change: opacity;
+}
+
+/* Accessibility Improvements */
+.gallery-lightbox-trigger:focus,
+.lightbox-close:focus,
+.lightbox-nav:focus,
+.thumbnail-item:focus,
+.thumbnail-nav:focus {
+    outline: 3px solid var(--ks-primary);
+    outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+    .gallery-lightbox-trigger,
+    .thumbnail-nav,
+    .gallery-thumbnails {
+        display: none !important;
+    }
+
+    .main-image-wrapper {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
