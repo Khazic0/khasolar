@@ -82,9 +82,17 @@ $stock_status  = ! empty( $stock_status ) ? $stock_status : 'in_stock';
                 <?php endif; ?>
             </div>
 
-            <a href="<?php the_permalink(); ?>" class="btn btn-primary btn-small">
-                <?php _e( 'Xem chi tiết', 'khasolar' ); ?>
-            </a>
+            <div class="product-card-actions">
+                <button type="button" class="add-to-compare <?php echo khasolar_is_product_in_compare( $product_id ) ? 'is-comparing' : ''; ?>" data-product-id="<?php echo esc_attr( $product_id ); ?>">
+                    <span class="dashicons dashicons-chart-bar"></span>
+                    <span class="compare-text">
+                        <?php echo khasolar_is_product_in_compare( $product_id ) ? __( 'Bỏ so sánh', 'khasolar' ) : __( 'So sánh', 'khasolar' ); ?>
+                    </span>
+                </button>
+                <a href="<?php the_permalink(); ?>" class="btn btn-primary btn-small">
+                    <?php _e( 'Xem chi tiết', 'khasolar' ); ?>
+                </a>
+            </div>
         </div>
     </div>
 </div>

@@ -206,11 +206,91 @@ function khasolar_add_leads_admin_menu() {
 add_action( 'admin_menu', 'khasolar_add_leads_admin_menu' );
 
 /**
+ * Export leads to CSV
+ */
+function khasolar_export_leads_csv() {
+    // Check permissions
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( __( 'Bạn không có quyền truy cập chức năng này.', 'khasolar' ) );
+    }
+
+    // Verify nonce
+    if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'export_leads_csv' ) ) {
+        wp_die( __( 'Lỗi bảo mật.', 'khasolar' ) );
+    }
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'khasolar_leads';
+
+    // Build query with optional date filters
+    $where = '1=1';
+    if ( ! empty( $_GET['from_date'] ) ) {
+        $from_date = sanitize_text_field( $_GET['from_date'] );
+        $where .= $wpdb->prepare( " AND DATE(created_at) >= %s", $from_date );
+    }
+    if ( ! empty( $_GET['to_date'] ) ) {
+        $to_date = sanitize_text_field( $_GET['to_date'] );
+        $where .= $wpdb->prepare( " AND DATE(created_at) <= %s", $to_date );
+    }
+
+    $leads = $wpdb->get_results( "SELECT * FROM $table_name WHERE $where ORDER BY created_at DESC" );
+
+    if ( empty( $leads ) ) {
+        wp_die( __( 'Không có dữ liệu để xuất.', 'khasolar' ) );
+    }
+
+    // Set headers for CSV download
+    header( 'Content-Type: text/csv; charset=utf-8' );
+    header( 'Content-Disposition: attachment; filename=khasolar-leads-' . date( 'Y-m-d' ) . '.csv' );
+    header( 'Pragma: no-cache' );
+    header( 'Expires: 0' );
+
+    // Open output stream
+    $output = fopen( 'php://output', 'w' );
+
+    // Add BOM for UTF-8 (helps Excel recognize UTF-8 encoding)
+    fprintf( $output, chr(0xEF).chr(0xBB).chr(0xBF) );
+
+    // CSV headers
+    fputcsv( $output, array(
+        'ID',
+        'Họ tên',
+        'Số điện thoại',
+        'Địa điểm',
+        'Sản phẩm',
+        'Ghi chú',
+        'Thời gian'
+    ) );
+
+    // CSV rows
+    foreach ( $leads as $lead ) {
+        fputcsv( $output, array(
+            $lead->id,
+            $lead->name,
+            $lead->phone,
+            $lead->location,
+            $lead->product_title,
+            $lead->note,
+            mysql2date( 'd/m/Y H:i:s', $lead->created_at )
+        ) );
+    }
+
+    fclose( $output );
+    exit;
+}
+
+/**
  * Admin page to display leads
  */
 function khasolar_leads_admin_page() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'khasolar_leads';
+
+    // Handle CSV export
+    if ( isset( $_GET['action'] ) && $_GET['action'] === 'export_csv' ) {
+        khasolar_export_leads_csv();
+        exit;
+    }
 
     // Handle delete action
     if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' && isset( $_GET['lead_id'] ) ) {
@@ -219,12 +299,117 @@ function khasolar_leads_admin_page() {
         echo '<div class="notice notice-success"><p>' . __( 'Đã xóa yêu cầu.', 'khasolar' ) . '</p></div>';
     }
 
+    // Get filter parameters
+    $from_date = isset( $_GET['from_date'] ) ? sanitize_text_field( $_GET['from_date'] ) : '';
+    $to_date   = isset( $_GET['to_date'] ) ? sanitize_text_field( $_GET['to_date'] ) : '';
+
+    // Build query with filters
+    $where = '1=1';
+    if ( ! empty( $from_date ) ) {
+        $where .= $wpdb->prepare( " AND DATE(created_at) >= %s", $from_date );
+    }
+    if ( ! empty( $to_date ) ) {
+        $where .= $wpdb->prepare( " AND DATE(created_at) <= %s", $to_date );
+    }
+
     // Get all leads
-    $leads = $wpdb->get_results( "SELECT * FROM $table_name ORDER BY created_at DESC" );
+    $leads = $wpdb->get_results( "SELECT * FROM $table_name WHERE $where ORDER BY created_at DESC" );
+
+    // Get statistics
+    $total_leads = $wpdb->get_var( "SELECT COUNT(*) FROM $table_name" );
+    $today_leads = $wpdb->get_var( "SELECT COUNT(*) FROM $table_name WHERE DATE(created_at) = CURDATE()" );
+    $week_leads  = $wpdb->get_var( "SELECT COUNT(*) FROM $table_name WHERE created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)" );
+    $month_leads = $wpdb->get_var( "SELECT COUNT(*) FROM $table_name WHERE created_at > DATE_SUB(NOW(), INTERVAL 30 DAY)" );
 
     ?>
     <div class="wrap">
         <h1><?php _e( 'Yêu cầu tư vấn', 'khasolar' ); ?></h1>
+
+        <!-- Statistics Cards -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 20px 0;">
+            <div style="background: #fff; padding: 20px; border-left: 4px solid #FF6B35; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3 style="margin: 0 0 10px; color: #666; font-size: 14px;"><?php _e( 'Tổng số leads', 'khasolar' ); ?></h3>
+                <p style="margin: 0; font-size: 32px; font-weight: bold; color: #FF6B35;"><?php echo number_format( $total_leads ); ?></p>
+            </div>
+            <div style="background: #fff; padding: 20px; border-left: 4px solid #004E89; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3 style="margin: 0 0 10px; color: #666; font-size: 14px;"><?php _e( 'Hôm nay', 'khasolar' ); ?></h3>
+                <p style="margin: 0; font-size: 32px; font-weight: bold; color: #004E89;"><?php echo number_format( $today_leads ); ?></p>
+            </div>
+            <div style="background: #fff; padding: 20px; border-left: 4px solid #1a8917; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3 style="margin: 0 0 10px; color: #666; font-size: 14px;"><?php _e( '7 ngày qua', 'khasolar' ); ?></h3>
+                <p style="margin: 0; font-size: 32px; font-weight: bold; color: #1a8917;"><?php echo number_format( $week_leads ); ?></p>
+            </div>
+            <div style="background: #fff; padding: 20px; border-left: 4px solid #d63638; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3 style="margin: 0 0 10px; color: #666; font-size: 14px;"><?php _e( '30 ngày qua', 'khasolar' ); ?></h3>
+                <p style="margin: 0; font-size: 32px; font-weight: bold; color: #d63638;"><?php echo number_format( $month_leads ); ?></p>
+            </div>
+        </div>
+
+        <!-- Filter and Export Bar -->
+        <div style="background: #fff; padding: 15px; margin: 20px 0; border: 1px solid #ccc;">
+            <form method="get" action="" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <input type="hidden" name="page" value="khasolar-leads" />
+
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    <strong><?php _e( 'Từ ngày:', 'khasolar' ); ?></strong>
+                    <input type="date" name="from_date" value="<?php echo esc_attr( $from_date ); ?>" />
+                </label>
+
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    <strong><?php _e( 'Đến ngày:', 'khasolar' ); ?></strong>
+                    <input type="date" name="to_date" value="<?php echo esc_attr( $to_date ); ?>" />
+                </label>
+
+                <button type="submit" class="button"><?php _e( 'Lọc', 'khasolar' ); ?></button>
+
+                <?php if ( ! empty( $from_date ) || ! empty( $to_date ) ) : ?>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=khasolar-leads' ) ); ?>" class="button">
+                        <?php _e( 'Xóa bộ lọc', 'khasolar' ); ?>
+                    </a>
+                <?php endif; ?>
+
+                <div style="margin-left: auto;">
+                    <?php
+                    $export_url = wp_nonce_url(
+                        add_query_arg(
+                            array(
+                                'page' => 'khasolar-leads',
+                                'action' => 'export_csv',
+                                'from_date' => $from_date,
+                                'to_date' => $to_date,
+                            ),
+                            admin_url( 'admin.php' )
+                        ),
+                        'export_leads_csv'
+                    );
+                    ?>
+                    <a href="<?php echo esc_url( $export_url ); ?>" class="button button-primary">
+                        <span class="dashicons dashicons-download" style="vertical-align: middle;"></span>
+                        <?php _e( 'Xuất CSV', 'khasolar' ); ?>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <?php if ( ! empty( $from_date ) || ! empty( $to_date ) ) : ?>
+            <div class="notice notice-info">
+                <p>
+                    <?php
+                    printf(
+                        __( 'Đang hiển thị %d leads', 'khasolar' ),
+                        count( $leads )
+                    );
+                    if ( $from_date && $to_date ) {
+                        printf( ' ' . __( 'từ %s đến %s', 'khasolar' ), $from_date, $to_date );
+                    } elseif ( $from_date ) {
+                        printf( ' ' . __( 'từ %s', 'khasolar' ), $from_date );
+                    } elseif ( $to_date ) {
+                        printf( ' ' . __( 'đến %s', 'khasolar' ), $to_date );
+                    }
+                    ?>
+                </p>
+            </div>
+        <?php endif; ?>
 
         <?php if ( empty( $leads ) ) : ?>
             <p><?php _e( 'Chưa có yêu cầu tư vấn nào.', 'khasolar' ); ?></p>

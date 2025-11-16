@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define theme constants
  */
-define( 'KHASOLAR_VERSION', '1.1.0' );
+define( 'KHASOLAR_VERSION', '1.2.0' );
 define( 'KHASOLAR_DIR', get_template_directory() );
 define( 'KHASOLAR_URI', get_template_directory_uri() );
 
@@ -32,14 +32,18 @@ require_once KHASOLAR_DIR . '/inc/demo-content.php';
 require_once KHASOLAR_DIR . '/inc/import-real-products.php';
 require_once KHASOLAR_DIR . '/inc/calculator.php';
 require_once KHASOLAR_DIR . '/inc/quick-contact.php';
+require_once KHASOLAR_DIR . '/inc/schema-markup.php';
+require_once KHASOLAR_DIR . '/inc/product-compare.php';
+require_once KHASOLAR_DIR . '/inc/reviews.php';
 
 /**
  * Theme activation hook
  * Create database tables and flush rewrite rules
  */
 function khasolar_activation() {
-    // Create leads database table
+    // Create database tables
     khasolar_create_leads_table();
+    khasolar_create_reviews_table();
 
     // Flush rewrite rules for custom post types
     flush_rewrite_rules();

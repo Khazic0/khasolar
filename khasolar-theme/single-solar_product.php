@@ -167,6 +167,11 @@ get_header();
                     <?php get_template_part( 'template-parts/product/lead-form' ); ?>
                 </section>
 
+                <!-- Reviews -->
+                <section class="product-section">
+                    <?php get_template_part( 'template-parts/product/reviews' ); ?>
+                </section>
+
             </div><!-- .product-details -->
 
             <!-- Related Products -->
